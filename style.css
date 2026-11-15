@@ -1,0 +1,1186 @@
+/* NASA Space Apps brand palette */
+:root {
+  --white: #FFFFFF;
+  --blue-yonder: #2E96F5;
+  --neon-blue: #0960E1;
+  --electric-blue: #0042A6;  /* PMS 2146 C */
+  --deep-blue: #07173F;      /* PMS 295 C */
+
+  --font-heading: "Fira Sans", Arial, sans-serif;  /* Black 900 / Bold 700 */
+  --font-body: "Overpass", Arial, sans-serif;      /* Regular / Bold / Italic */
+  --font-code: "Fira Code", monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  overflow: hidden;
+  background: var(--deep-blue);
+}
+
+code,
+pre {
+  font-family: var(--font-code);
+}
+
+.welcome-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+
+  /*
+   * 45° diagonal (CSS "135deg" = top-left → bottom-right):
+   * Blue Yonder → Neon Blue → Electric Blue → Deep Blue.
+   * Stops are evenly spaced and blended in OKLab so the colors melt
+   * into each other instead of forming visible bands.
+   */
+  background: linear-gradient(
+    135deg,
+    var(--blue-yonder) 0%,
+    var(--neon-blue) 33%,
+    var(--electric-blue) 67%,
+    var(--deep-blue) 100%
+  );
+  background: linear-gradient(
+    135deg in oklab,
+    var(--blue-yonder) 0%,
+    var(--neon-blue) 33%,
+    var(--electric-blue) 67%,
+    var(--deep-blue) 100%
+  );
+
+  /* Planets can be dragged, so stop the browser from scrolling/selecting */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Fallback star background (hidden once the star field is running) */
+
+.stars {
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    radial-gradient(2px 2px at 10% 20%, var(--white) 99%, transparent),
+    radial-gradient(2px 2px at 25% 70%, var(--white) 99%, transparent),
+    radial-gradient(3px 3px at 40% 35%, var(--white) 99%, transparent),
+    radial-gradient(2px 2px at 60% 15%, var(--white) 99%, transparent),
+    radial-gradient(3px 3px at 75% 55%, var(--white) 99%, transparent),
+    radial-gradient(2px 2px at 90% 30%, var(--white) 99%, transparent),
+    radial-gradient(2px 2px at 85% 85%, var(--white) 99%, transparent),
+    radial-gradient(3px 3px at 15% 90%, var(--white) 99%, transparent),
+    radial-gradient(2px 2px at 50% 80%, var(--white) 99%, transparent);
+
+  background-size: 350px 350px;
+  opacity: 0.8;
+  transition: opacity 1s ease;
+}
+
+.webgl-ready .stars {
+  opacity: 0;
+}
+
+/* Star field canvas */
+
+#spaceCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Cursor hints for turning the Moon and Mars */
+html.can-grab,
+html.can-grab * {
+  cursor: grab !important;
+}
+
+html.is-grabbing,
+html.is-grabbing * {
+  cursor: grabbing !important;
+}
+
+/* Title */
+
+.title-container {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 20px 6vh; /* small lift so it sits at the optical center */
+  max-width: 900px;
+  animation: rise-in 1s ease-out both;
+}
+
+.subtitle {
+  display: inline-block;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: 5px;
+  font-size: 13px;
+  margin-bottom: 18px;
+  padding: 6px 16px;
+  border: 1px solid #FFFFFF40;
+  border-radius: 50px;
+  background: #FFFFFF14;
+}
+
+/* A little star shining beside the title */
+.title-star {
+  position: relative;
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: 0.12em;
+  vertical-align: 0.55em;
+  color: var(--white);
+  filter: drop-shadow(0 0 6px #FFFFFFCC) drop-shadow(0 0 16px var(--blue-yonder));
+  animation: star-shine 2.4s ease-in-out infinite;
+}
+
+.title-star svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes star-shine {
+  0%, 100% { transform: scale(0.82) rotate(0deg); opacity: 0.8; }
+  50%      { transform: scale(1.12) rotate(18deg); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title-star { animation: none; }
+}
+
+h1 {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  color: var(--white);
+  font-size: clamp(38px, 7vw, 82px);
+  letter-spacing: 2px;
+  line-height: 1.05;
+  opacity: 0.92;
+
+  /* Soft depth instead of a bright glow */
+  text-shadow:
+    0 4px 0 var(--electric-blue),
+    0 8px 20px #07173F99;
+}
+
+h2 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--white);
+  opacity: 0.85;
+  font-size: clamp(22px, 3vw, 34px);
+  margin-top: 12px;
+}
+
+.description {
+  color: var(--white);
+  font-size: 17px;
+  line-height: 1.6;
+  margin: 18px auto 26px;
+  max-width: 520px;
+  text-shadow: 0 2px 8px #07173F80;
+}
+
+/* Buttons */
+
+button {
+  font-family: var(--font-heading);
+  background: var(--white);
+  color: var(--electric-blue);
+  border: none;
+  border-radius: 50px;
+  padding: 16px 38px;
+  font-size: 19px;
+  font-weight: 700;
+  cursor: pointer;
+
+  box-shadow: 0 5px 25px #07173F80;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+button:hover {
+  transform: scale(1.08);
+}
+
+button:focus-visible {
+  outline: 3px solid var(--white);
+  outline-offset: 4px;
+}
+
+#startButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  animation: button-pulse 2.4s ease-in-out infinite;
+}
+
+#startButton:hover {
+  box-shadow: 0 0 0 6px #FFFFFF33, 0 0 32px var(--blue-yonder);
+}
+
+.button-icon {
+  display: inline-block;
+  transition: transform 0.3s;
+}
+
+#startButton:hover .button-icon {
+  transform: translateX(4px) rotate(-30deg);
+}
+
+/* Name tag for the Forgotten Explorers */
+
+.explorer-label {
+  position: fixed;
+  z-index: 5;
+  left: 0;
+  top: 0;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--deep-blue);
+  box-shadow: 0 8px 24px #07173F66;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.explorer-label.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.explorer-label strong {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--electric-blue);
+}
+
+.explorer-label span {
+  display: block;
+  font-size: 13px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Story: Chapter 1                                                    */
+/* ------------------------------------------------------------------ */
+
+.story-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  background: transparent; /* the welcome warp shows through while the blue fades in */
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* The helmet edge only appears once the launch pad is built */
+.story-screen:not(.scene-ready) .visor-frame {
+  opacity: 0;
+}
+
+/* Outside shots (watching the rocket land) aren't seen through our helmet */
+.story-screen.outside-view .visor-frame {
+  opacity: 0;
+}
+
+.story-screen[hidden] {
+  display: none;
+}
+
+.story-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Soft helmet-visor edge: we see the world through our own helmet */
+.visor-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 75% 70% at 50% 46%, transparent 62%, #07173F59 88%, #07173FB3 100%),
+    linear-gradient(115deg, transparent 8%, #FFFFFF14 12%, transparent 17%);
+}
+
+.story-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: var(--blue-yonder);
+  opacity: 0;
+}
+
+/* Dialogue box */
+
+.dialogue {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(760px, calc(100% - 32px));
+  padding: 30px 26px 20px;
+  border-radius: 22px;
+  background: var(--white);
+  color: var(--deep-blue);
+  box-shadow: 0 12px 40px #07173F80;
+  cursor: pointer;
+  animation: dialogue-in 0.3s ease-out both;
+}
+
+.dialogue[hidden] {
+  display: none;
+}
+
+.dialogue-speaker {
+  position: absolute;
+  top: -16px;
+  left: 22px;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--white);
+  background: var(--electric-blue);
+  box-shadow: 0 4px 12px #07173F4D;
+}
+
+.dialogue[data-role="robot"] .dialogue-speaker {
+  background: var(--neon-blue);
+}
+
+.dialogue[data-role="you"] .dialogue-speaker {
+  background: var(--blue-yonder);
+}
+
+.dialogue-text {
+  min-height: 3.2em;
+  font-size: clamp(16px, 2.2vw, 20px);
+  line-height: 1.55;
+}
+
+.dialogue[data-role="you"] .dialogue-text {
+  font-style: italic;
+}
+
+.dialogue-next {
+  display: block;
+  margin: 10px 0 0 auto;
+  padding: 10px 22px;
+  font-size: 16px;
+  background: var(--electric-blue);
+  color: var(--white);
+  box-shadow: none;
+  animation: none;
+}
+
+.dialogue-next:hover {
+  transform: scale(1.05);
+}
+
+/* Mission day counter (top middle) */
+
+.day-counter {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: min(300px, calc(100% - 96px));
+  min-width: 150px;
+  padding: 6px 20px 8px;
+  border: 2px solid var(--blue-yonder);
+  border-radius: 18px;
+  background: #07173FCC;
+  color: var(--white);
+  text-align: left;
+  pointer-events: none;
+  box-shadow: 0 6px 20px #07173F66;
+}
+
+.day-counter[hidden],
+.day-found[hidden] {
+  display: none;
+}
+
+.day-label {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  opacity: 0.85;
+}
+
+.day-num {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1.05;
+}
+
+.day-loc {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--blue-yonder);
+}
+
+.day-loc:empty {
+  display: none;
+}
+
+.day-found {
+  margin-top: 2px;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 13px;
+}
+
+.day-counter.pop,
+.day-found.pop {
+  animation: day-pop 0.5s ease-out both;
+}
+
+@keyframes day-pop {
+  0%   { transform: translateX(var(--dx, 0)) scale(0.8); }
+  60%  { transform: translateX(var(--dx, 0)) scale(1.1); }
+  100% { transform: translateX(var(--dx, 0)) scale(1); }
+}
+
+.day-counter { --dx: 0; transform-origin: top left; }
+.day-found { --dx: 0; }
+
+/* Ask PIP chat panel (right side, so PIP stays in view) */
+
+.chat-panel {
+  position: absolute;
+  top: 96px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(400px, calc(100% - 32px));
+  padding: 16px;
+  border: 2px solid var(--blue-yonder);
+  border-radius: 22px;
+  background: #07173FEE;
+  color: var(--white);
+  font-family: var(--font-body);
+  box-shadow: 0 18px 50px #07173F99;
+  animation: chat-in 0.3s ease-out both;
+}
+
+.chat-panel[hidden] {
+  display: none;
+}
+
+.chat-kicker {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--blue-yonder);
+}
+
+.chat-title {
+  margin: 2px 0 0;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.chat-status {
+  margin: 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+/* A little light that matches what PIP is doing */
+.chat-status::before {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3DDC84;
+}
+
+.chat-panel[data-state="thinking"] .chat-status::before {
+  background: var(--blue-yonder);
+  animation: chat-blink 0.35s steps(2) infinite;
+}
+
+.chat-panel[data-state="speaking"] .chat-status::before {
+  background: #FFB627;
+  animation: chat-pulse 0.6s ease-in-out infinite;
+}
+
+.chat-panel[data-state="oops"] .chat-status::before {
+  background: #FF8A3D;
+}
+
+.chat-log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 4px;
+}
+
+.chat-msg {
+  max-width: 92%;
+  padding: 10px 13px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.chat-name {
+  margin-bottom: 3px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.chat-pip {
+  align-self: flex-start;
+  background: var(--electric-blue);
+}
+
+.chat-explorer {
+  align-self: flex-start;
+  background: var(--white);
+  color: var(--deep-blue);
+  border: 3px solid transparent;
+}
+
+.chat-explorer.is-speaking {
+  border-color: #FFB627;
+}
+
+.chat-you {
+  align-self: flex-end;
+  background: var(--blue-yonder);
+}
+
+/* Several sources in a row read "1, 2" */
+.chat-body sup + sup::before {
+  content: ",";
+}
+
+.chat-body sup a,
+.chat-sources a {
+  color: var(--neon-blue);
+  font-weight: 700;
+}
+
+.chat-sources {
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.chat-sources summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.chat-sources ol {
+  margin: 4px 0 0;
+  padding-left: 20px;
+}
+
+.chat-typing .chat-body {
+  display: flex;
+  gap: 5px;
+  padding: 4px 2px;
+}
+
+.chat-typing .chat-body span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--white);
+  animation: chat-dot 1s ease-in-out infinite;
+}
+
+.chat-typing .chat-body span:nth-child(2) { animation-delay: 0.15s; }
+.chat-typing .chat-body span:nth-child(3) { animation-delay: 0.3s; }
+
+.chat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chat-chip {
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  background: transparent;
+  color: var(--white);
+  border: 2px solid var(--blue-yonder);
+  border-radius: 999px;
+  box-shadow: none;
+  animation: none;
+  cursor: pointer;
+}
+
+.chat-chip:hover:not(:disabled) {
+  background: var(--neon-blue);
+}
+
+.chat-form {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 14px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--deep-blue);
+  background: var(--white);
+  border: 2px solid transparent;
+  border-radius: 14px;
+}
+
+.chat-form input:focus {
+  outline: none;
+  border-color: var(--blue-yonder);
+}
+
+.chat-form button,
+.chat-done {
+  padding: 10px 18px;
+  font-size: 15px;
+  box-shadow: none;
+  animation: none;
+}
+
+.chat-form button:disabled,
+.chat-chip:disabled,
+.chat-form input:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.chat-done {
+  background: var(--electric-blue);
+  color: var(--white);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* The story's dialogue box steps aside while the chat is open */
+.story-screen.chat-open .dialogue {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .chat-panel {
+    top: auto;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    height: 58vh;
+  }
+}
+
+@keyframes chat-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes chat-blink {
+  50% { opacity: 0.2; }
+}
+
+@keyframes chat-pulse {
+  50% { transform: scale(1.35); }
+}
+
+@keyframes chat-dot {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* The scrapbook */
+
+.scrapbook {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 16px;
+  background: #07173F99;
+}
+
+.scrapbook[hidden] {
+  display: none;
+}
+
+.book {
+  width: min(920px, 100%);
+  perspective: 1600px;
+}
+
+.book-spread {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: min(480px, 64vh);
+  border-radius: 14px;
+  background: #FFF9EE;
+  color: var(--deep-blue);
+  box-shadow: 0 0 0 10px var(--electric-blue), 0 24px 60px #07173FAA;
+  overflow: hidden;
+  transform-origin: left center;
+}
+
+.book-spread.turn {
+  animation: page-turn 0.55s ease-out both;
+}
+
+@keyframes page-turn {
+  from { transform: rotateY(-70deg); opacity: 0.2; }
+  to   { transform: rotateY(0deg); opacity: 1; }
+}
+
+.book-left,
+.book-right {
+  padding: 26px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.book-left {
+  border-right: 2px dashed #0042A633;
+  align-items: center;
+}
+
+.book-photo {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 16 / 10;
+  background: var(--deep-blue);
+  border: 10px solid var(--white);
+  box-shadow: 0 8px 18px #07173F44;
+  transform: rotate(-2deg);
+  object-fit: cover;
+}
+
+.book-tape {
+  width: 90px;
+  height: 22px;
+  margin-bottom: -26px;
+  z-index: 1;
+  background: #2E96F566;
+  transform: rotate(3deg);
+}
+
+.book-kicker {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--neon-blue);
+}
+
+.book-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: clamp(22px, 3vw, 32px);
+  line-height: 1.1;
+}
+
+.book-where {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--electric-blue);
+}
+
+.book-facts {
+  margin: 4px 0 0;
+  padding-left: 22px;
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.book-facts li + li {
+  margin-top: 8px;
+}
+
+.book-cover {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 30px;
+  text-align: center;
+  background: linear-gradient(135deg, #2E96F5, #0960E1 45%, #0042A6 75%, #07173F);
+  color: var(--white);
+}
+
+.book-cover .book-title {
+  font-size: clamp(30px, 5vw, 52px);
+}
+
+.book-cover .book-kicker,
+.book-cover .book-where {
+  color: var(--white);
+}
+
+.book-thumbs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: min(560px, 100%);
+}
+
+.book-thumbs img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border: 5px solid var(--white);
+  background: var(--deep-blue);
+}
+
+.book-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.book-controls button {
+  padding: 10px 20px;
+  font-size: 16px;
+  animation: none;
+}
+
+.book-controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.book-count {
+  min-width: 70px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--white);
+}
+
+@media (max-width: 720px) {
+  .book-spread {
+    grid-template-columns: 1fr;
+  }
+  .book-left {
+    border-right: none;
+    border-bottom: 2px dashed #0042A633;
+  }
+  .book-facts {
+    font-size: 15px;
+  }
+}
+
+/* Countdown / "CLICK!" / "LIFTOFF!" */
+
+.countdown {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: clamp(96px, 22vw, 240px);
+  color: var(--white);
+  text-shadow: 0 6px 0 var(--electric-blue), 0 12px 40px #07173FCC;
+}
+
+.countdown[hidden] {
+  display: none;
+}
+
+.countdown.pop {
+  animation: count-pop 0.95s ease-out both;
+}
+
+.countdown.small {
+  align-items: flex-start;
+  padding-top: 16vh;
+  font-size: clamp(36px, 6vw, 60px);
+}
+
+.countdown.liftoff {
+  font-size: clamp(64px, 14vw, 170px);
+}
+
+/* "DAY 1", "DAY 2"… captions during the trip */
+.countdown.caption {
+  align-items: flex-start;
+  padding-top: 12vh;
+  font-size: clamp(40px, 7vw, 80px);
+  letter-spacing: 8px;
+}
+
+.countdown.caption.pop {
+  animation: caption-pop 2.6s ease-out both;
+}
+
+@keyframes caption-pop {
+  0%   { opacity: 0; transform: translateY(-14px); }
+  15%  { opacity: 1; transform: translateY(0); }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.countdown.liftoff.pop {
+  animation: liftoff-pop 0.6s ease-out both;
+}
+
+@keyframes count-pop {
+  0%   { opacity: 0; transform: scale(1.6); }
+  20%  { opacity: 1; transform: scale(1); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(0.92); }
+}
+
+@keyframes liftoff-pop {
+  0%   { opacity: 0; transform: scale(0.6); }
+  60%  { opacity: 1; transform: scale(1.12); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Sound on/off button */
+.sound-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 30;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #FFFFFF26;
+  color: var(--white);
+  box-shadow: inset 0 0 0 2px #FFFFFF66;
+  backdrop-filter: blur(6px);
+}
+
+.sound-toggle:hover {
+  transform: scale(1.08);
+}
+
+.sound-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+.sound-toggle .icon-off,
+.sound-toggle.is-muted .icon-on {
+  display: none;
+}
+
+.sound-toggle.is-muted .icon-off {
+  display: block;
+}
+
+/* End of chapter card */
+
+.story-end {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px;
+  text-align: center;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--blue-yonder), var(--neon-blue) 33%, var(--electric-blue) 67%, var(--deep-blue));
+}
+
+.story-end[hidden] {
+  display: none;
+}
+
+.story-end h2 {
+  font-weight: 900;
+  opacity: 1;
+  font-size: clamp(32px, 6vw, 60px);
+  text-shadow: 0 4px 0 var(--electric-blue), 0 8px 20px #07173F99;
+}
+
+.story-end p {
+  font-size: 18px;
+}
+
+.story-end-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--white);
+  box-shadow: inset 0 0 0 2px var(--white);
+}
+
+@keyframes dialogue-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Launching state: the title flies away while the stars rush past */
+
+.is-launching .title-container {
+  animation: fly-out 0.8s ease-in forwards;
+}
+
+/* Animations */
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fly-out {
+  to { opacity: 0; transform: translateY(-40px); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes button-pulse {
+  0%, 100% { box-shadow: 0 5px 25px #07173F80, 0 0 0 0 #FFFFFF66; }
+  50%      { box-shadow: 0 5px 25px #07173F80, 0 0 0 10px #FFFFFF00; }
+}
+
+/* Mobile adjustments */
+
+@media (max-width: 600px) {
+  .title-container {
+    padding: 0 16px 8vh;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    letter-spacing: 4px;
+    margin-bottom: 14px;
+  }
+
+  .description {
+    font-size: 15px;
+    margin: 14px auto 20px;
+  }
+
+  button {
+    font-size: 17px;
+    padding: 14px 30px;
+  }
+}
+
+/* Short landscape screens (phones turned sideways) */
+
+@media (max-height: 520px) {
+  .title-container {
+    padding-bottom: 0;
+  }
+
+  .description {
+    display: none;
+  }
+
+  h2 {
+    margin-bottom: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

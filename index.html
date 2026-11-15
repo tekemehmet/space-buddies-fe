@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lost No More: A Voyage Beyond</title>
+  <meta name="description" content="An educational space adventure that helps kids explore the Moon, Mars and beyond.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@700;900&family=Overpass:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="welcome-screen" id="welcomeScreen">
+
+    <!-- Fallback stars (shown only if the star field can't load) -->
+    <div class="stars" aria-hidden="true"></div>
+
+    <!-- Three.js draws the stars, Moon and Mars here -->
+    <canvas id="spaceCanvas" aria-hidden="true"></canvas>
+
+    <section class="title-container" id="titleContainer">
+      <p class="subtitle">NASA SPACE APPS 2026</p>
+      <h1>LOST NO MORE: A VOYAGE BEYOND</h1>
+      <h2>The Forgotten Explorers</h2>
+      <p class="description">
+        Blast off with your astronaut buddy to explore the Moon, Mars and the
+        brave explorers history almost forgot!
+      </p>
+      <button id="startButton" type="button">
+        <span class="button-label">Start Adventure</span>
+        <span class="button-icon" aria-hidden="true">&#10148;</span>
+      </button>
+    </section>
+
+    <!-- Name tag for the Forgotten Explorers (shown on hover / tap) -->
+    <div class="explorer-label" id="explorerLabel" role="status" aria-live="polite"></div>
+
+  </main>
+
+  <!-- Chapter 1: Boarding Day (3D, first-person) -->
+  <section class="story-screen" id="storyScreen" aria-label="Chapter 1: Boarding Day" hidden>
+    <!-- story.js adds its 3D canvas here -->
+    <div class="visor-frame" aria-hidden="true"></div>
+
+    <div class="dialogue" id="dialogue" hidden>
+      <div class="dialogue-speaker" id="dialogueSpeaker"></div>
+      <p class="dialogue-text" id="dialogueText" aria-live="polite"></p>
+      <button class="dialogue-next" id="dialogueNext" type="button">Next <span aria-hidden="true">&#9656;</span></button>
+    </div>
+
+    <div class="day-counter" id="dayCounter" aria-live="polite" hidden>
+      <span class="day-label">MISSION DAY</span>
+      <span class="day-num">1</span>
+      <span class="day-loc"></span>
+      <span class="day-found" hidden></span>
+    </div>
+
+    <div class="countdown" id="countdown" aria-live="assertive" hidden></div>
+
+    <!-- Ask PIP: questions go to the Space Buddies backend; PIP's pose follows this panel -->
+    <aside class="chat-panel" id="chatPanel" aria-labelledby="chatTitle" hidden>
+      <header class="chat-header">
+        <p class="chat-kicker">ASK PIP</p>
+        <h3 class="chat-title" id="chatTitle">Ask PIP</h3>
+        <p class="chat-status" id="chatStatus" aria-live="polite"></p>
+      </header>
+      <div class="chat-log" id="chatLog" aria-live="polite"></div>
+      <div class="chat-chips" id="chatChips"></div>
+      <form class="chat-form" id="chatForm" autocomplete="off">
+        <label class="visually-hidden" for="chatInput">Your question</label>
+        <input id="chatInput" type="text" maxlength="1000" placeholder="Type your question…">
+        <button id="chatSend" type="submit">Ask</button>
+      </form>
+      <button class="chat-done" id="chatDone" type="button">Back to the mission <span aria-hidden="true">&#9656;</span></button>
+    </aside>
+
+    <!-- The scrapbook Nova gives us at the end -->
+    <div class="scrapbook" id="scrapbook" role="dialog" aria-label="My Forgotten Explorers scrapbook" hidden>
+      <div class="book">
+        <div class="book-spread" id="bookSpread"></div>
+      </div>
+      <div class="book-controls">
+        <button id="bookPrev" type="button" class="secondary"><span aria-hidden="true">&#9666;</span> Back</button>
+        <span class="book-count" id="bookCount"></span>
+        <button id="bookNext" type="button">Next page <span aria-hidden="true">&#9656;</span></button>
+      </div>
+    </div>
+
+    <div class="story-fade" id="storyFade" aria-hidden="true"></div>
+
+    <section class="story-end" id="storyEnd" hidden>
+      <p class="subtitle">6 FORGOTTEN EXPLORERS FOUND</p>
+      <h2>To be continued…</h2>
+      <p>Next: another Forgotten Explorer!</p>
+      <div class="story-end-buttons">
+        <button id="playAgainButton" type="button">Play again</button>
+        <button id="backButton" type="button" class="secondary">Back to base</button>
+      </div>
+    </section>
+  </section>
+
+  <!-- Sound on/off -->
+  <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true" aria-label="Sound on">
+    <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+
+  <script src="config.js"></script>
+  <script src="lines.js"></script>
+  <script src="audio.js"></script>
+  <script src="scene.js"></script>
+  <script src="chat.js"></script>
+  <script src="story.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
