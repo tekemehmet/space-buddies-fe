@@ -235,6 +235,9 @@
     get muted() { return muted; },
     setMuted(m) {
       muted = !!m;
+      if (muted) {
+      window.AstroVoice?.stop();
+    }
       try { localStorage.setItem("astroMuted", muted ? "1" : "0"); } catch (e) { /* ignore */ }
       if (ctx) {
         master.gain.cancelScheduledValues(ctx.currentTime);
