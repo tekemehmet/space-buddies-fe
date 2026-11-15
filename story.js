@@ -1225,6 +1225,7 @@
     ui.screen.addEventListener("click", onAdvance);
     window.addEventListener("keydown", onAdvance);
     run.cleanup.push(() => {
+      window.AstroVoice?.stop();
       ui.screen.removeEventListener("click", onAdvance);
       window.removeEventListener("keydown", onAdvance);
       ui.dialogue.hidden = true;
@@ -1232,6 +1233,7 @@
     });
 
     function say(who, text) {
+      window.AstroVoice?.speak(who, text);
       check();
       const role = who === NAMES.you ? "you" : who === NAMES.robot ? "robot" : "commander";
       ui.dialogue.hidden = false;
@@ -1241,7 +1243,7 @@
 
       return new Promise((resolve) => {
         let shown = 0;
-        let typing = !reduceMotion;
+        let typing = !reduceMotion && !window.AstroVoice;;
         let finished = false;
         if (!typing) ui.text.textContent = text;
         const typer = typing ? setInterval(() => {
@@ -1264,6 +1266,7 @@
           if (finished) return;
           finished = true;
           advance = null;
+          window.AstroVoice?.stop();
           resolve();
         };
       }).then(check);
