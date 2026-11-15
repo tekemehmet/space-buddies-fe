@@ -18,18 +18,69 @@
 (function () {
   "use strict";
 
-  const EXPLORERS = {
-    "lunar-module": {
-      short: "Eagle",
-      title: "Apollo 11 Lunar Module “Eagle”",
-      chips: ["How did you land on the Moon?", "What was it like inside you?", "Why did your top part fly away?"],
-    },
-    "lunar-rover": {
-      short: "the Lunar Roving Vehicle",
-      title: "Apollo 15 Lunar Roving Vehicle",
-      chips: ["How fast could you drive?", "How did you get your power?", "Why are your wheels made of mesh?"],
-    },
-  };
+  
+const EXPLORERS = {
+  "lunar-module": {
+    short: "Eagle",
+    title: "Apollo 11 Lunar Module Eagle",
+    chips: [
+      "How did Eagle land on the Moon?",
+      "What was it like inside Eagle?",
+      "Why did Eagle's upper section fly away?"
+    ],
+  },
+
+  "lunar-rover": {
+    short: "the Lunar Roving Vehicle",
+    title: "Apollo 15 Lunar Roving Vehicle",
+    chips: [
+      "How fast could the lunar rover travel?",
+      "How was the lunar rover powered?",
+      "Why did the lunar rover have mesh wheels?"
+    ],
+  },
+
+  "spirit": {
+    short: "Spirit",
+    title: "Spirit Mars Rover",
+    chips: [
+      "What did Spirit discover on Mars?",
+      "How did Spirit travel across Mars?",
+      "Why did Spirit's mission end?"
+    ],
+  },
+
+  "opportunity": {
+    short: "Opportunity",
+    title: "Opportunity Mars Rover",
+    chips: [
+      "How did Opportunity survive so long on Mars?",
+      "What evidence of water did Opportunity find?",
+      "What happened during Opportunity's final days?"
+    ],
+  },
+
+  "insight": {
+    short: "InSight",
+    title: "InSight Mars Lander",
+    chips: [
+      "How did InSight detect marsquakes?",
+      "What did InSight discover inside Mars?",
+      "Why did InSight stop working?"
+    ],
+  },
+
+  "ingenuity": {
+    short: "Ingenuity",
+    title: "Ingenuity Mars Helicopter",
+    chips: [
+      "How did Ingenuity fly in the thin Martian atmosphere?",
+      "What was Ingenuity's greatest achievement?",
+      "Why did Ingenuity's mission end?"
+    ],
+  },
+};
+
   const MIN_LEN = 3, MAX_LEN = 1000;
   const TIMEOUT_MS = 45000;
 
